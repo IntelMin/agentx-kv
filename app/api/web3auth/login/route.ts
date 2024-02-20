@@ -3,6 +3,7 @@ import { ethers } from 'ethers'
 import { signToken } from '@/lib/utils'
 
 import { kv } from '@vercel/kv'
+import { User } from '@/lib/types'
 
 export async function POST(req: Request) {
   const json = await req.json()
@@ -17,7 +18,7 @@ export async function POST(req: Request) {
   }
 
   try {
-    const result = await kv.get(address)
+    const result = await kv.get(address) as User
     if (result) {
       if (result?.auth.genNonce !== nonce) {
         return NextResponse.json(
@@ -42,7 +43,7 @@ export async function POST(req: Request) {
     }
 
     return NextResponse.json(
-      { error: userError?.message || 'Internal Server Error' },
+      { error: 'Internal Server Error' },
       { status: 500 }
     )
   } catch (error: any) {

@@ -12,7 +12,7 @@ export async function getChats(userId?: string | null) {
   try {
     const results = await kv.get(`chathistory:${userId}`)
     // return results as Chat[]
-    return results
+    return results as Chat[]
 
   } catch (error) {
     return []
@@ -20,7 +20,7 @@ export async function getChats(userId?: string | null) {
 }
 
 export async function getChat(userId: string) {
-  const chat = await kv.get(`chathistory:${userId}`)  
+  const chat = await kv.get(`chathistory:${userId}`) as Chat
 
   if (!chat || (userId && chat.userId !== userId)) {
     return null

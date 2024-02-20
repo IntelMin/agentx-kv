@@ -21,6 +21,7 @@ import { toast } from 'react-hot-toast'
 import { usePathname } from 'next/navigation'
 import { getChat } from '@/app/actions'
 import { useAccount } from 'wagmi'
+import { Chat } from '@/lib/types'
 
 const IS_PREVIEW = process.env.VERCEL_ENV === 'preview'
 
@@ -64,7 +65,7 @@ export function Chat({ id, initialMessages, className }: ChatProps) {
   useEffect(() => {
     if (address) {
       getChat(address)
-       .then((_history: ChatHistory | null) => {
+       .then((_history: Chat | null) => {
         if (_history) {
           setData(_history.messages);
         }

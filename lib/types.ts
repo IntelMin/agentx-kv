@@ -17,3 +17,13 @@ export type ServerActionResult<Result> = Promise<
       error: string
     }
 >
+
+export interface User extends Record<string, any> {
+  id: string
+  userId: string
+  auth: {
+    genNonce: number,
+    lastAuth: string,
+    lastAuthStatus: string
+  }
+}

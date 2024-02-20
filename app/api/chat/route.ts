@@ -41,40 +41,20 @@ export async function POST(req: Request) {
       const id = json.id ?? nanoid()
       const createdAt = Date.now()
       const path = `/chat/${id}`
-      var oldHistory = await kv.get(`chathistory:${userId}`) as any
-      var payload = {};
-      if(oldHistory) {
-        payload = {
-          id,
-          title,
-          userId,
-          createdAt,
-          path,
-          messages: [
-            ...oldHistory.messages,
-            ...messages,
-            {
-              content: completion,
-              role: 'assistant'
-            }
-          ]
-        }
-      } else {
-        payload = {
-          id,
-          title,
-          userId,
-          createdAt,
-          path,
-          messages: [
-            ...messages,
-            {
-              content: completion,
-              role: 'assistant'
-            }
-          ]
-        } 
-      }
+      const payload = {
+        id,
+        title,
+        userId,
+        createdAt,
+        path,
+        messages: [
+          ...messages,
+          {
+            content: completion,
+            role: 'assistant'
+          }
+        ]
+      } 
       await kv.set(`chathistory:${userId}`, payload)
     }
   })

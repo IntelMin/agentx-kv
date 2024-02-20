@@ -8,8 +8,6 @@ export const auth = async () => {
   const web3jwt = cookies().get('web3jwt')?.value || ''
 
   const validToken = await verifyToken(web3jwt, address)
-  console.log('web3jwt:', web3jwt )
-  console.log('validToken:', validToken )
   if (web3jwt && validToken) {
 
     const user = await kv.get(address) as User

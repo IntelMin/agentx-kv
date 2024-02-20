@@ -85,7 +85,7 @@ export function LoginButtonMetamask({
           })
         })
   
-        console.log(response)
+        // console.log(response)
   
         // Handle the response from the API
         if (response.ok) {

@@ -14,25 +14,17 @@ import {
   DialogHeader,
   DialogTitle
 } from '@/components/ui/dialog'
-import { useEffect, useState } from 'react'
+import { useState } from 'react'
 import { Button } from './ui/button'
 import { Input } from './ui/input'
 import { toast } from 'react-hot-toast'
 import { usePathname } from 'next/navigation'
-import { getChat } from '@/app/actions'
-import { useAccount } from 'wagmi'
-import { Chat } from '@/lib/types'
 
 const IS_PREVIEW = process.env.VERCEL_ENV === 'preview'
 
 export interface ChatProps extends React.ComponentProps<'div'> {
   initialMessages?: Message[]
   id?: string
-}
-
-interface ChatHistory {
-  messages?: string[];
-  // Other properties if any
 }
 
 export function Chat({ id, initialMessages, className }: ChatProps) {
@@ -43,7 +35,6 @@ export function Chat({ id, initialMessages, className }: ChatProps) {
   const { messages, append, reload, stop, isLoading, input, setInput } =
     useChat({
       initialMessages,
-      id,
       body: {
         id,
         previewToken
@@ -57,29 +48,15 @@ export function Chat({ id, initialMessages, className }: ChatProps) {
         if (!path.includes('chat')) {
           window.history.pushState({}, '', `/chat/${id}`)
         }
-      }
+      },
     })
-  const [data, setData] = useState<any>(null);
-  const { address, isConnected } = useAccount()
-
-  useEffect(() => {
-    if (address) {
-      getChat(address)
-       .then((_history: Chat | null) => {
-        if (_history) {
-          setData(_history.messages);
-        }
-      })
-      .catch(console.log);
-    }
-  }, [address, messages])
 
   return (
     <>
       <div className={cn('pb-[200px] pt-4 md:pt-10', className)}>
-        {data && data.length ? (
+        {messages && messages.length ? (
           <>
-            <ChatList messages={data} />
+            <ChatList messages={messages} />
             <ChatScrollAnchor trackVisibility={isLoading} />
           </>
         ) : (

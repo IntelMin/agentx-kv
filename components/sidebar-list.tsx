@@ -3,6 +3,7 @@ import { ClearHistory } from '@/components/clear-history'
 import { SidebarItems } from '@/components/sidebar-items'
 import { ThemeToggle } from '@/components/theme-toggle'
 import { cache } from 'react'
+
 interface SidebarListProps {
   userId?: string
   children?: React.ReactNode

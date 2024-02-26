@@ -8,20 +8,17 @@ import { TailwindIndicator } from '@/components/tailwind-indicator'
 import { Providers } from '@/components/providers'
 import { Header } from '@/components/header'
 
-// import { ThirdwebSDKProvider } from "@thirdweb-dev/react";
-// import { ethers } from "ethers";
-
 export const metadata = {
   metadataBase: new URL(`https://${process.env.VERCEL_URL}`),
   title: {
-    default: 'OCADA AI',
-    template: `OCADA AI`
+    default: 'Next.js AI Chatbot',
+    template: `%s - Next.js AI Chatbot`
   },
-  description: 'OCADA AI Agent.',
+  description: 'An AI-powered chatbot template built with Next.js and Vercel.',
   icons: {
-    icon: '/OCADA.svg',
-    shortcut: '/OCADA.svg',
-    apple: '/OCADA.svg'
+    icon: '/favicon.ico',
+    shortcut: '/favicon-16x16.png',
+    apple: '/apple-touch-icon.png'
   }
 }
 
@@ -38,8 +35,7 @@ interface RootLayoutProps {
 
 export default function RootLayout({ children }: RootLayoutProps) {
   return (
-
-      <html lang="en" suppressHydrationWarning>
+    <html lang="en" suppressHydrationWarning>
       <body
         className={cn(
           'font-sans antialiased',
@@ -62,8 +58,5 @@ export default function RootLayout({ children }: RootLayoutProps) {
         </Providers>
       </body>
     </html>
-
-            
-
   )
 }

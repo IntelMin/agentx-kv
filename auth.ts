@@ -1,22 +1,86 @@
-import { jsonResponse, verifyToken } from '@/lib/utils'
-import { cookies } from 'next/headers'
-import { kv } from '@vercel/kv'
-import { type User } from '@/lib/types'
+import NextAuth, { type DefaultSession } from 'next-auth'
+import { headers } from 'next/headers';
+import CredentialsProvider from "next-auth/providers/credentials"
+// import { SiweMessage } from "siwe"
+import { SigninMessage } from './utils/signMessage';
 
-export const auth = async () => {
-  const address = cookies().get('address')?.value || ''
-  const web3jwt = cookies().get('web3jwt')?.value || ''
-
-  const validToken = await verifyToken(web3jwt, address)
-  if (web3jwt && validToken) {
-
-    const user = await kv.get(address) as User
-    if (user) return user
-    return null;
-  } else {
-    if (address) cookies().delete('address')
-    if (web3jwt) cookies().delete('web3jwt')
+declare module 'next-auth' {
+  interface Session {
+    user: {
+      /** The user's id. */
+      id: string
+    } & DefaultSession['user']
   }
-
-  return null
 }
+
+const providers = [
+  CredentialsProvider({
+    name: "Solana",
+    credentials: {
+      message: {
+        label: "Message",
+        type: "text",
+        placeholder: "0x0",
+      },
+      signature: {
+        label: "Signature",
+        type: "text",
+        placeholder: "0x0",
+      },
+      nonce: {
+        label: "Nonce",
+        type: "text",
+      }
+    },
+    async authorize(credentials) {
+      try {
+        const msg = credentials?.message;
+        const siws = new SigninMessage(JSON.parse(msg ? (msg as string) : '{}'))
+        const nextAuthUrl = new URL(headers().get('host') as string)
+        const signature = credentials?.signature;
+        const nonce = credentials?.nonce;
+        const result = await siws.validate(signature ? (signature as string) : '',)
+        if (result) {
+          return {
+            id: siws.publicKey,
+          }
+        }
+        return null
+      } catch (e) {
+        return null
+      }
+    },
+  }),
+]
+
+export const {
+  handlers: { GET, POST },
+  auth
+} = NextAuth({
+  providers,
+  callbacks: {
+    jwt({ token, profile }) {
+      if (profile) {
+        token.id = profile.id
+        token.image = profile.avatar_url || profile.picture
+      }
+      return token
+    },
+    session: ({ session, token }) => {
+      if (session?.user && token?.sub) {
+        session.user.id = String(token.sub)
+      }
+      return session
+    },
+    authorized({ auth }) {
+      return !!auth?.user // this ensures there is a logged in user for -every- request
+    },
+    redirect({ url, baseUrl }) {
+      if (url.startsWith("/")) return `${baseUrl}${url}`
+      return baseUrl
+    }
+  },
+  pages: {
+    signIn: '/sign-in' // overrides the next-auth default signin page https://authjs.dev/guides/basics/pages
+  }
+})
